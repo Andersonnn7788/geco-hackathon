@@ -5,6 +5,7 @@ app = FastAPI(title="Infinity8 API")
 
 origins = [
     "http://localhost:3000",  # Next.js dev / Docker port
+    "http://backend:8000", # Backend Docker port
 ]
 
 app.add_middleware(
