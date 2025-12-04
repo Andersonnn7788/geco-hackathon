@@ -4,7 +4,7 @@ LangGraph agent for room booking with Amazon Bedrock.
 import os
 from typing import Annotated, TypedDict, Sequence, Optional
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage, ToolMessage
-from langchain_aws import ChatBedrock
+from langchain_aws import ChatBedrockConverse
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -58,18 +58,16 @@ def create_agent_graph(db: AsyncSession, user: Optional[User] = None):
     # Get the Bedrock model ARN from environment or use default
     model_id = os.getenv(
         "BEDROCK_MODEL_ID",
-        "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+        "amazon.nova-pro-v1:0"
     )
     region = os.getenv("AWS_REGION", "us-east-1")
     
-    # Initialize Bedrock chat model
-    llm = ChatBedrock(
-        model_id=model_id,
+    # Initialize Bedrock chat model using Converse API (supports Nova, Claude, and other models)
+    llm = ChatBedrockConverse(
+        model=model_id,
         region_name=region,
-        model_kwargs={
-            "max_tokens": 1024,
-            "temperature": 0.7,
-        }
+        max_tokens=1024,
+        temperature=0.7,
     )
     
     # Get tools with db session and user context

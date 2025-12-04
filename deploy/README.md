@@ -6,7 +6,7 @@ This guide explains how to deploy the Infinity8 Coworking Space Platform to AWS 
 
 1. AWS Account with access to:
    - EC2
-   - Amazon Bedrock (Claude Sonnet 4.5 enabled in us-east-1)
+   - Amazon Bedrock (Amazon Nova Pro enabled in us-east-1)
    
 2. AWS credentials with Bedrock access
 
@@ -70,7 +70,7 @@ SECRET_KEY=YOUR_RANDOM_SECRET_HERE
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_KEY
-BEDROCK_MODEL_ID=us.anthropic.claude-sonnet-4-5-20250929-v1:0
+BEDROCK_MODEL_ID=amazon.nova-pro-v1:0
 
 # Frontend API URL (your EC2 public IP or domain)
 NEXT_PUBLIC_API_BASE_URL=http://YOUR_EC2_PUBLIC_IP
@@ -125,9 +125,9 @@ docker-compose -f docker-compose.prod.yml logs backend | grep -i bedrock
 
 2. Verify AWS credentials are correct in `.env.production`
 
-3. Ensure Claude Sonnet 4.5 is enabled in your AWS account:
+3. Ensure Amazon Nova Pro is enabled in your AWS account:
    - Go to AWS Console > Bedrock > Model Access
-   - Request access to Anthropic Claude models
+   - Request access to Amazon Nova models
 
 ### Database Issues
 
