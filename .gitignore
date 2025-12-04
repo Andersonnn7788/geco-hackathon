@@ -19,8 +19,6 @@ backend/.mypy_cache/
 # === Docker ===
 *.log
 docker-compose.override.yml
-**/Dockerfile*
-**/.dockerignore
 
 # === OS / Editor ===
 .DS_Store
