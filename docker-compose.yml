@@ -1,14 +1,40 @@
 version: "3.9"
 
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: geco-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: infinity8
+      POSTGRES_PASSWORD: infinity8_secret
+      POSTGRES_DB: infinity8_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U infinity8 -d infinity8_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./backend
     container_name: geco-backend
     restart: unless-stopped
     ports:
       - "8000:8000"
-    # optional but nice:
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
+      - DATABASE_URL=postgresql+asyncpg://infinity8:infinity8_secret@db:5432/infinity8_db
+      - SECRET_KEY=your-super-secret-key-change-in-production
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID:-us.anthropic.claude-sonnet-4-5-20250929-v1:0}
       - UVICORN_WORKERS=1
 
   frontend:
@@ -19,5 +45,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # IMPORTANT: inside Docker, the backend is reachable via service name "backend"
       - NEXT_PUBLIC_API_BASE_URL=http://backend:8000
+
+volumes:
+  postgres_data:

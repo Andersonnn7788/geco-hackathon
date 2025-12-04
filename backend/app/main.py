@@ -1,11 +1,31 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Infinity8 API")
+from app.core.database import create_tables
+from app.routers import auth_router, spaces_router, bookings_router, admin_router, chat_router
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: create tables
+    await create_tables()
+    yield
+    # Shutdown: cleanup if needed
+
+
+app = FastAPI(
+    title="Infinity8 API",
+    description="Coworking Space Booking Platform API",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+# CORS configuration
 origins = [
-    "http://localhost:3000",  # Next.js dev / Docker port
-    "http://backend:8000", # Backend Docker port
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://frontend:3000",
 ]
 
 app.add_middleware(
@@ -16,28 +36,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
+app.include_router(auth_router)
+app.include_router(spaces_router)
+app.include_router(bookings_router)
+app.include_router(admin_router)
+app.include_router(chat_router)
+
 
 @app.get("/health")
 async def health():
     return {"status": "ok"}
 
 
-@app.get("/spaces")
-async def list_spaces():
-    # temporary mock data; later this comes from DB
-    return [
-        {
-            "id": "private-office-kl-1",
-            "name": "Private Office – KL Eco City",
-            "type": "Private Office",
-            "capacity": "4–6 pax",
-            "price": "From RM1,800 / month",
-        },
-        {
-            "id": "hot-desk-bangsar-1",
-            "name": "Hot Desk – Bangsar South",
-            "type": "Hot Desk",
-            "capacity": "1 pax",
-            "price": "From RM35 / day",
-        },
-    ]
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to Infinity8 Coworking Space API",
+        "docs": "/docs",
+        "health": "/health"
+    }
