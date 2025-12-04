@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: geco-backend
+    ports:
+      - "8000:8000"
+    # optional but nice:
+    environment:
+      - UVICORN_WORKERS=1
+
+  frontend:
+    build: ./frontend
+    container_name: geco-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      # IMPORTANT: inside Docker, the backend is reachable via service name "backend"
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:8000
