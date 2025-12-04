@@ -1,33 +1,12 @@
 version: "3.9"
 
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: geco-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: infinity8
-      POSTGRES_PASSWORD: infinity8_secret
-      POSTGRES_DB: infinity8_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U infinity8 -d infinity8_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   backend:
     build: ./backend
     container_name: geco-backend
     restart: unless-stopped
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:infinity8@geco-db.cyreeki8k7c5.us-east-1.rds.amazonaws.com:5432/postgres
@@ -47,6 +26,3 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_API_BASE_URL=http://backend:8000
-
-volumes:
-  postgres_data:
