@@ -31,3 +31,6 @@ Thumbs.db
 *.db
 *.pid
 *.py[cod]
+
+.env
+.env.*

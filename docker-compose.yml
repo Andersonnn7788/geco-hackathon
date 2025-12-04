@@ -9,7 +9,7 @@ services:
       - "8000:8000"
     environment:
       environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:infinity8@geco-db.cyreeki8k7c5.us-east-1.rds.amazonaws.com:5432/postgres
+      - DATABASE_URL=${DATABASE_URL}
       - SECRET_KEY=your-super-secret-key-change-in-production
       - AWS_REGION=${AWS_REGION:-us-east-1}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
