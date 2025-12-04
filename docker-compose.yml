@@ -29,7 +29,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      - DATABASE_URL=postgresql+asyncpg://infinity8:infinity8_secret@db:5432/infinity8_db
+      environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:infinity8@geco-db.cyreeki8k7c5.us-east-1.rds.amazonaws.com:5432/postgres
       - SECRET_KEY=your-super-secret-key-change-in-production
       - AWS_REGION=${AWS_REGION:-us-east-1}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}

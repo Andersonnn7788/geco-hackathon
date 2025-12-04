@@ -4,6 +4,9 @@ import { useState, useRef, useEffect } from "react";
 import { chatWithAgent, ChatMessage, ApiError } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { MessageCircle, X, Send, Sparkles, Building2, Calendar, MapPin, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export function ChatWidget() {
   const { isAuthenticated } = useAuth();
@@ -30,7 +33,6 @@ export function ChatWidget() {
     setInput("");
     setError("");
 
-    // Add user message immediately
     const updatedMessages: ChatMessage[] = [
       ...messages,
       { role: "user", content: userMessage },
@@ -47,7 +49,6 @@ export function ChatWidget() {
       } else {
         setError("Failed to get response. Please try again.");
       }
-      // Remove the optimistic user message on error
       setMessages(messages);
     } finally {
       setIsLoading(false);
@@ -59,12 +60,11 @@ export function ChatWidget() {
     setError("");
   };
 
-  // Welcome message suggestions
   const suggestions = [
-    "Show me available meeting rooms",
-    "I need a hot desk for tomorrow",
-    "What spaces are available in KL Eco City?",
-    "Help me book a private office for 4 people",
+    { text: "Show me available meeting rooms", icon: Building2 },
+    { text: "I need a hot desk for tomorrow", icon: Calendar },
+    { text: "What spaces are in KL Eco City?", icon: MapPin },
+    { text: "Book a private office for 4 people", icon: Users },
   ];
 
   const handleSuggestion = (suggestion: string) => {
@@ -76,57 +76,88 @@ export function ChatWidget() {
       {/* Chat Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-[var(--primary)] text-white rounded-full shadow-lg hover:bg-[var(--primary-light)] transition-all z-50 flex items-center justify-center"
-        aria-label="Open chat"
+        className={`fixed bottom-6 right-6 z-50 ${isOpen ? "hidden" : "block"}`}
       >
-        {isOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-          </svg>
-        )}
+        <div className="relative">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-emerald-600 rounded-2xl shadow-xl flex items-center justify-center hover:shadow-2xl transition-shadow">
+            <MessageCircle className="w-7 h-7 text-white" />
+          </div>
+          
+          {/* Pulse indicator */}
+          <span className="absolute -top-1 -right-1 flex h-5 w-5">
+            <span className="relative inline-flex rounded-full h-5 w-5 bg-emerald-500 border-2 border-white shadow-sm"></span>
+          </span>
+        </div>
       </button>
 
       {/* Chat Panel */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-white border border-[var(--border)] rounded-xl shadow-xl z-50 flex flex-col overflow-hidden">
+        <div className="fixed bottom-6 right-6 w-[420px] max-w-[calc(100vw-3rem)] h-[650px] max-h-[calc(100vh-3rem)] z-50 flex flex-col bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--background)]">
-            <div>
-              <h3 className="font-semibold text-sm">Booking Assistant</h3>
-              <p className="text-xs text-[var(--muted)]">
-                {isAuthenticated ? "Ready to help you book" : "Sign in to book spaces"}
-              </p>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-emerald-50">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-600 flex items-center justify-center shadow-md">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm">Booking Assistant</h3>
+                <p className="text-xs text-slate-500">
+                  {isAuthenticated ? "Ready to help you book" : "Sign in to book spaces"}
+                </p>
+              </div>
             </div>
-            <button
-              onClick={handleClearChat}
-              className="text-xs text-[var(--muted)] hover:text-[var(--foreground)]"
-            >
-              Clear
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleClearChat}
+                className="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1.5 rounded-lg hover:bg-white/50 transition-colors"
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-9 h-9 rounded-xl hover:bg-white/50 flex items-center justify-center transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50">
             {messages.length === 0 ? (
-              <div className="text-center py-4">
-                <p className="text-sm text-[var(--muted)] mb-4">
-                  Hi! I can help you find and book workspaces at Infinity8.
-                </p>
-                <p className="text-xs text-[var(--muted)] mb-3">Try asking:</p>
+              <div className="h-full flex flex-col justify-center">
+                <div className="text-center mb-8">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-50 to-emerald-50 flex items-center justify-center">
+                    <Sparkles className="w-10 h-10 text-blue-600" />
+                  </div>
+                  <h4 className="font-semibold text-lg mb-2">Hi! I&apos;m your booking assistant</h4>
+                  <p className="text-sm text-slate-500">
+                    I can help you find and book the perfect workspace
+                  </p>
+                </div>
+                
                 <div className="space-y-2">
-                  {suggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleSuggestion(suggestion)}
-                      className="block w-full text-left text-xs px-3 py-2 bg-[var(--background)] rounded-lg hover:bg-[var(--border)] transition-colors"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
+                  <p className="text-xs text-slate-400 text-center mb-3 font-medium">Try asking:</p>
+                  {suggestions.map((suggestion, index) => {
+                    const Icon = suggestion.icon;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => handleSuggestion(suggestion.text)}
+                        className="flex items-center gap-3 w-full text-left text-sm px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-blue-200 hover:shadow-sm transition-all"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-slate-400" />
+                        </div>
+                        <span className="text-slate-600">
+                          {suggestion.text}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ) : (
@@ -136,13 +167,13 @@ export function ChatWidget() {
                   className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${
+                    className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm ${
                       message.role === "user"
-                        ? "bg-[var(--primary)] text-white"
-                        : "bg-[var(--background)] text-[var(--foreground)]"
+                        ? "bg-gradient-to-br from-blue-600 to-emerald-600 text-white shadow-md rounded-br-sm"
+                        : "bg-white border border-slate-200 text-slate-700 shadow-sm rounded-bl-sm"
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{formatMessage(message.content)}</div>
+                    <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
                   </div>
                 </div>
               ))
@@ -150,15 +181,20 @@ export function ChatWidget() {
             
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-[var(--background)] px-4 py-3 rounded-lg">
-                  <LoadingSpinner size="sm" />
+                <div className="bg-white border border-slate-200 px-5 py-3.5 rounded-2xl rounded-bl-sm shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <LoadingSpinner size="sm" />
+                    <span className="text-xs text-slate-400">Thinking...</span>
+                  </div>
                 </div>
               </div>
             )}
             
             {error && (
               <div className="text-center">
-                <p className="text-xs text-red-500">{error}</p>
+                <p className="text-xs text-red-600 bg-red-50 border border-red-100 px-4 py-2.5 rounded-xl inline-block">
+                  {error}
+                </p>
               </div>
             )}
             
@@ -166,38 +202,37 @@ export function ChatWidget() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="p-3 border-t border-[var(--border)]">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about spaces or bookings..."
-                className="flex-1 input text-sm"
-                disabled={isLoading}
-              />
-              <button
+          <form onSubmit={handleSubmit} className="p-5 bg-white border-t border-slate-200">
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about spaces or bookings..."
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all"
+                  disabled={isLoading}
+                />
+              </div>
+              <Button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="btn btn-primary px-3"
+                size="icon"
+                className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-600"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
+                {isLoading ? (
+                  <LoadingSpinner size="sm" />
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
+              </Button>
             </div>
+            <p className="text-xs text-slate-400 mt-3 text-center">
+              Powered by AI • Responses may vary
+            </p>
           </form>
         </div>
       )}
     </>
   );
 }
-
-// Helper function to format message content (handle markdown-like formatting)
-function formatMessage(content: string): string {
-  // Basic formatting - keep it simple for the chat
-  return content
-    .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold markers but keep text
-    .trim();
-}
-
