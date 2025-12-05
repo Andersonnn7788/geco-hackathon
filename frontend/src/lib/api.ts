@@ -1,4 +1,5 @@
 // API client for Infinity8 backend
+import { supabase } from "./supabase";
 
 // Handle API URL for both server-side and client-side rendering
 const getApiBaseUrl = () => {
@@ -11,6 +12,12 @@ const getApiBaseUrl = () => {
 };
 
 const API_BASE_URL = getApiBaseUrl();
+
+// Get current access token from Supabase
+async function getAccessToken(): Promise<string | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || null;
+}
 
 // Types
 export interface User {
@@ -92,7 +99,7 @@ async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token = await getAccessToken();
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -120,35 +127,7 @@ async function apiRequest<T>(
   return response.json();
 }
 
-// Auth API
-export async function register(email: string, password: string, fullName: string): Promise<AuthResponse> {
-  return apiRequest<AuthResponse>("/auth/register", {
-    method: "POST",
-    body: JSON.stringify({ email, password, full_name: fullName }),
-  });
-}
-
-export async function login(email: string, password: string): Promise<AuthResponse> {
-  const formData = new URLSearchParams();
-  formData.append("username", email);
-  formData.append("password", password);
-
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Login failed" }));
-    throw new ApiError(response.status, error.detail);
-  }
-
-  return response.json();
-}
-
+// Auth API - Now handled by Supabase, but we still need to get user from backend
 export async function getCurrentUser(): Promise<User> {
   return apiRequest<User>("/auth/me");
 }

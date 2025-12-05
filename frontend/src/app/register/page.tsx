@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { register, ApiError } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Mail, Lock, User as UserIcon, ArrowRight } from "lucide-react";
@@ -12,17 +11,19 @@ import { Card } from "@/components/ui/card";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { login: authLogin } = useAuth();
+  const { signUp } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -37,15 +38,22 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const response = await register(email, password, fullName);
-      authLogin(response.access_token, response.user);
-      router.push("/spaces");
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred");
+      const { error: signUpError } = await signUp(email, password, fullName);
+      
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
       }
+
+      // Check if email confirmation is required
+      setSuccess("Account created! Please check your email to verify your account.");
+      
+      // Redirect to spaces after a short delay
+      setTimeout(() => {
+        router.push("/spaces");
+      }, 2000);
+    } catch {
+      setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +84,12 @@ export default function RegisterPage() {
             {error && (
               <div className="p-4 text-sm text-red-600 bg-red-50 rounded-lg border border-red-100">
                 {error}
+              </div>
+            )}
+            
+            {success && (
+              <div className="p-4 text-sm text-green-600 bg-green-50 rounded-lg border border-green-100">
+                {success}
               </div>
             )}
 

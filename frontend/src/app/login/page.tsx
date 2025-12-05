@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { login, ApiError } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Mail, Lock, ArrowRight, Info } from "lucide-react";
@@ -12,7 +11,7 @@ import { Card } from "@/components/ui/card";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login: authLogin } = useAuth();
+  const { signIn, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,20 +23,23 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await login(email, password);
-      authLogin(response.access_token, response.user);
+      const { error: signInError } = await signIn(email, password);
       
-      if (response.user.role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/spaces");
+      if (signInError) {
+        setError(signInError.message);
+        return;
       }
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred");
-      }
+
+      // Wait a moment for user data to sync
+      setTimeout(() => {
+        if (user?.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/spaces");
+        }
+      }, 500);
+    } catch {
+      setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -133,22 +135,15 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Demo credentials */}
+          {/* Demo credentials info */}
           <Card className="mt-6 p-4 bg-blue-50 border-blue-100">
             <div className="flex items-start gap-2 mb-2">
               <Info className="w-4 h-4 text-blue-600 mt-0.5" />
-              <span className="text-sm font-medium text-blue-900">Demo Credentials</span>
+              <span className="text-sm font-medium text-blue-900">Supabase Auth</span>
             </div>
-            <div className="space-y-1.5 text-xs text-blue-700">
-              <div className="flex justify-between">
-                <span className="font-medium">Admin:</span>
-                <code className="bg-white/50 px-2 py-0.5 rounded">admin@infinity8.my / admin123</code>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">User:</span>
-                <code className="bg-white/50 px-2 py-0.5 rounded">user@demo.com / user123</code>
-              </div>
-            </div>
+            <p className="text-xs text-blue-700">
+              Authentication is now powered by Supabase. Create a new account or sign in with your existing credentials.
+            </p>
           </Card>
         </Card>
       </div>

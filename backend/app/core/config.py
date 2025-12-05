@@ -10,9 +10,12 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql+asyncpg://infinity8:infinity8_secret@localhost:5432/infinity8_db"
 
-    # JWT
-    secret_key: str = "your-super-secret-key-change-in-production"
+    # Supabase Auth
+    supabase_jwt_secret: str = "your-supabase-jwt-secret"
     algorithm: str = "HS256"
+
+    # Legacy JWT settings (kept for backwards compatibility)
+    secret_key: str = "your-super-secret-key-change-in-production"
     access_token_expire_minutes: int = 60 * 24  # 24 hours
 
     class Config:
