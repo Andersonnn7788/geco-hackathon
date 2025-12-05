@@ -57,3 +57,4 @@ class SpaceAvailability(BaseModel):
     date: str
     available_slots: List[dict]  # [{"start": "09:00", "end": "10:00", "available": True}]
 
+

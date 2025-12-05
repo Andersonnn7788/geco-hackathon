@@ -189,3 +189,4 @@ async def cancel_booking(
     booking.status = BookingStatus.cancelled
     await db.commit()
 
+

@@ -47,3 +47,4 @@ class Booking(Base):
     def __repr__(self) -> str:
         return f"<Booking {self.id}: User {self.user_id} -> Space {self.space_id}>"
 
+

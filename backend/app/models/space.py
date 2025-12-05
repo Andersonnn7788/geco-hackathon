@@ -39,3 +39,4 @@ class Space(Base):
     def __repr__(self) -> str:
         return f"<Space {self.name} ({self.type})>"
 
+

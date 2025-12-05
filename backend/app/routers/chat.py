@@ -126,3 +126,4 @@ async def agent_status():
             "message": f"AI assistant is currently unavailable: {str(e)}"
         }
 
+

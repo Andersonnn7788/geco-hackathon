@@ -8,9 +8,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      environment:
       - DATABASE_URL=${DATABASE_URL}
-      - SECRET_KEY=your-super-secret-key-change-in-production
+      - SECRET_KEY=${SECRET_KEY}
       - AWS_REGION=${AWS_REGION:-us-east-1}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}

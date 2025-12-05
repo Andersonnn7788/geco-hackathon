@@ -53,3 +53,4 @@ echo "4. Edit .env.production with your credentials"
 echo "5. Run: cd /opt/infinity8 && ./deploy/deploy.sh"
 echo ""
 
+

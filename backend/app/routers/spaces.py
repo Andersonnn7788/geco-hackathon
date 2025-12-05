@@ -173,3 +173,4 @@ async def delete_space(
     space.is_active = False
     await db.commit()
 
+

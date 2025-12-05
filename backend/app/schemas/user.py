@@ -33,3 +33,4 @@ class Token(BaseModel):
     token_type: str = "bearer"
     user: UserResponse
 
+

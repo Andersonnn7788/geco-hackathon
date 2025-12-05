@@ -178,3 +178,4 @@ async def update_user_role(
 
     return {"message": f"User role updated to {role.value}"}
 
+

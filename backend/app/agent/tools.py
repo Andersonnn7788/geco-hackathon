@@ -337,3 +337,4 @@ def get_agent_tools(db: AsyncSession, user: Optional[User] = None):
 
     return [search_spaces, check_availability, create_booking, get_user_bookings, cancel_booking]
 
+
