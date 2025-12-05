@@ -192,6 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signUp,
         signIn,
         signOut,
+        logout: signOut,
         refreshUser,
       }}
     >
